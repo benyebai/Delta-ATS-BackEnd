@@ -1,13 +1,10 @@
-require('dotenv').config()
-console.log(process.env)
-
 const Pool = require('pg').Pool
 const pool = new Pool({
-  user: process.env.USER,
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-  port: process.env.PORT,   
+  user: 'me',
+  host: 'localhost',
+  database: 'api',
+  password: 'amogus',
+  port: 5432,   
 })
 
 const getUsers = (request, response) => {
@@ -68,10 +65,28 @@ const deleteUser = (request, response) => {
   })
 }
 
+const checkUserPassword = (request, response) => {
+
+    //const account_email = parseInt(request.params.account_email)
+    const {email, password} = request.body
+
+    pool.query('SELECT * FROM applicant_data.account_details WHERE email = $1 AND password = crypt($2, password)', [email, password], (error, results) =>{
+
+        if (error) {
+            throw error
+        }
+
+          response.status(201).send(results.rows);
+
+
+    })
+}
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
+  checkUserPassword
 }
