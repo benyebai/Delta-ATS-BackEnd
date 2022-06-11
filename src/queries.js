@@ -1,6 +1,8 @@
 require('dotenv').config()
-const Pool = require('pg').Pool
 
+const { validationResult } = require('express-validator');
+
+const Pool = require('pg').Pool
 
 //Move this out
 const pool = new Pool({
@@ -11,25 +13,6 @@ const pool = new Pool({
     port: process.env.PORT
 })
 
-const getUsers = (request, response) => {
-    pool.query('SELECT * FROM applicant_data.account_details', (error, results) => {
-        if (error){
-            throw error
-        }
-        response.status(200).json(results.rows)
-    })
-}
-
-const getUserById = (request, response) => {
-    
-    const account_id = parseInt(request.params.account_id)
-    pool.query('SELECT * FROM applicant_data.account_details WHERE account_id = $1', [account_id], (error, results) =>{
-        if (error) {
-            throw error
-        }
-        response.status(200).json(results.rows)
-    })
-}
 
 
 const checkUserPassword = (request, response) => {
@@ -42,7 +25,6 @@ const checkUserPassword = (request, response) => {
         if (error) {
             throw error
         }
-
           response.status(201).send(results.rows);
     })
 }
@@ -50,15 +32,58 @@ const checkUserPassword = (request, response) => {
 
 
 const createUser = (request, response) => {
-    const {email, password, creation_date} = request.body
-
-    pool.query('INSERT INTO applicant_data.account_details (email,  password, creation_date) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3) ', [email, password, creation_date], (error, results) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(422).json({errors:errors.array()})
+  }
+    const {email, password, pronoun, firstName, lastName, country, province, city, postalCode, address, phoneNum} = request.body;
+    var creation_date = new Date();
+    creation_date =  (creation_date.getUTCFullYear() + '-' + (creation_date.getUTCMonth() + 1) + '-' + creation_date.getUTCDate());
+    
+    pool.on('error', (err, client) =>  {
+      console.error('Unexpected error on idle client', err)
+      process.exit(-1)
+    })
+    pool.connect((err, client, done)=> {
+      if (err) throw err
+      client.query('INSERT INTO applicant_data.account_details (email,  password, creation_date) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3) ', [email, password, creation_date], (error, results) => {
+        //done()
         if (error){
             throw error
         }
-        response.status(201).send(`User added`)
-    })
+         })
+
+         client.query('INSERT INTO applicant_data.contact_info (phone_number,  address, city, country, postal_code, province) VALUES ($1, $2, $3, $4, $5, $6) ', [phoneNum, address, city, country, postalCode, province], (error, results) => {
+         // done()
+          if (error){
+            return console.error("Error with database input", error.stack)
+          }
+         
+        })
+
+        client.query('INSERT INTO applicant_data.profile_table (first_name,  last_name, pronoun) VALUES ($1, $2, $3) ', [firstName, lastName, pronoun], (error, results) => {
+          done()
+          if (error){
+              throw error
+          }
+          response.status(201).send(`Profile Added`)
+           }) 
+      })
+    
 }
+
+
+const checkValidEmail = (request, response) => {
+  const {email} = request.body
+  pool.query('SELECT exists(SELECT * FROM applicant_data.account_details WHERE email = $1)', [email], (error, results) => {
+      if (error){
+          throw error
+      }
+      response.status(201).send(results.rows)
+  })
+}
+
+//Unused
 
 const updateUser = (request, response) => {
     const account_id = parseInt(request.params.account_id)
@@ -76,7 +101,7 @@ const updateUser = (request, response) => {
     )
   }
 
-
+//Unused
   const deleteUser = (request, response) => {
     const account_id = parseInt(request.params.account_id)
   
@@ -87,11 +112,26 @@ const updateUser = (request, response) => {
       response.status(200).send(`User deleted with ID: ${account_id}`)
     })
   }
+
+  //Unused
+const getUserById = (request, response) => {
+    
+  const account_id = parseInt(request.params.account_id)
+  pool.query('SELECT * FROM applicant_data.account_details WHERE account_id = $1', [account_id], (error, results) =>{
+      if (error) {
+          throw error
+      }
+      response.status(200).json(results.rows)
+  })
+}
+
+
   module.exports = {
-    getUsers,
+    checkValidEmail,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
     checkUserPassword,
+
   }
