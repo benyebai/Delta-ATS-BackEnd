@@ -1,4 +1,6 @@
 require('dotenv').config()
+const config = require("./auth.config");
+var jwt = require("jsonwebtoken");
 
 const { validationResult } = require('express-validator');
 
@@ -25,7 +27,15 @@ const checkUserPassword = (request, response) => {
         if (error) {
             throw error
         }
-          response.status(201).send(results.rows);
+         
+    var token = jwt.sign({ id: email }, config.secret, {
+      expiresIn: 86400 // 24 hours
+    });
+      //console.log(results.email)
+
+      response.status(201).send({        
+        accessToken: token
+      });
     })
 }
 
