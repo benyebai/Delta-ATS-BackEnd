@@ -1,10 +1,26 @@
 const express = require('express')
 
 const db = require('./queries')
-
+const { body } = require('express-validator');
 const bodyParser = require('body-parser')
 const app = express()
 const port = 3001
+
+var loginValidate = [
+  body('email', 'Email is invalid').isEmail(),
+  body('password').isLength({ min: 8 })
+  .withMessage('Password Must Be at Least 8 Characters')
+  .matches('[0-9]').withMessage('Password Must Contain a Number')
+  .matches('[A-Z]').withMessage('Password Must Contain an Uppercase Letter')
+  .trim().escape(), 
+  body('phoneNum').isNumeric().withMessage("Phone number must only consist of numbers").isLength({ max: 11 }).escape(),
+  body('firstName').isAlpha().withMessage('Name must consist of only letters.').escape(),
+  body('lastName').isAlpha().withMessage('Last name must consist of only letters.').escape(),
+  body('city').isAlpha().withMessage('City must consist of only letters.').escape(),
+  body('postalCode').escape(),
+  body('address').escape(),
+];
+
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -22,16 +38,20 @@ app.use(
     })
   )
 
-app.get('/', (request, response) => {
-    response.json({info: 'amogus'})
-})
 
-app.get('/users', db.getUsers)
-app.get('/users/:account_id', db.getUserById)
-app.post('/users/authenticate', db.checkUserPassword)
-app.post('/users', db.createUser)
+
+
+app.post('/users/checkValidEmail',  db.checkValidEmail),
+
+app.post('/users/authenticate',
+    db.checkUserPassword)
+
+app.post('/users/create',loginValidate, db.createUser)
+
+//Unused calls
 app.put('/users/:account_id', db.updateUser)
 app.delete('/users/:account_id', db.deleteUser)
+app.get('/users/:account_id', db.getUserById)
 
 app.listen(port, () => {  
     console.log(`Example app listening on port ${port}`)
