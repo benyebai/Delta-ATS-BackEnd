@@ -135,6 +135,57 @@ const getUserById = (request, response) => {
   })
 }
 
+const modifyInfo = (request, response) => {
+
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(400).json({errors:errors.array()})
+  }
+  
+  const profile_id = parseInt(request.body.profileID)
+
+  const first_name = request.body.firstName
+  const last_name = request.body.lastName
+  const pronoun = request.body.pronouns
+
+
+  const contact_id = parseInt(request.body.contactID)
+  
+  const city = request.body.city
+  const country = request.body.country
+  const postal_code = request.body.postalCode
+
+  const phone_number = request.body.phoneNum
+  const address = request.body.address
+  const province = request.body.province
+
+  
+  pool.connect((error, client, release) => {
+    if (error) {
+      return console.error("Error with client", error.stack)
+    }
+    client.query('UPDATE public.profile_table SET first_name = $1, last_name = $2, pronoun = $3 WHERE profile_id = $4', [first_name, last_name, pronoun, profile_id], (error, results) => {
+      
+      release()
+      if (error){
+        return console.error("Error with database input", error.stack)
+      }
+    })
+    
+
+  })
+  
+  //'UPDATE public.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id]
+  
+  pool.query('UPDATE public.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    
+  })
+
+}
+
 
   module.exports = {
     checkValidEmail,
@@ -143,5 +194,6 @@ const getUserById = (request, response) => {
     updateUser,
     deleteUser,
     checkUserPassword,
+    modifyInfo
 
   }
