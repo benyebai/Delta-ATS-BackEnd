@@ -52,6 +52,12 @@ app.post('/users/create',loginValidate, db.createUser)
 app.put('/users/:account_id', db.updateUser)
 app.delete('/users/:account_id', db.deleteUser)
 app.get('/users/:account_id', db.getUserById)
+app.post('/modify', 
+  body('firstName').isAlpha().isLength({max:30}),
+  body('lastName').isAlpha().isLength({max:30}),
+  body('phoneNum').isLength({max:12}).isMobilePhone(),
+  body('postalCode').isAlphanumeric(),
+  db.modifyInfo)
 
 app.listen(port, () => {  
     console.log(`Example app listening on port ${port}`)
