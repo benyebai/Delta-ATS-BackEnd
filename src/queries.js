@@ -36,7 +36,8 @@ const createUser = (request, response) => {
   if (!errors.isEmpty()) {
     return response.status(422).json({errors:errors.array()})
   }
-    const {email, password, pronoun, firstName, lastName, country, province, city, postalCode, address, phoneNum} = request.body;
+    const {email, password, firstName, lastName, country, province, city, postalCode, address, phoneNum} = request.body;
+    const pronoun = "He"
     var creation_date = new Date();
     creation_date =  (creation_date.getUTCFullYear() + '-' + (creation_date.getUTCMonth() + 1) + '-' + creation_date.getUTCDate());
     
