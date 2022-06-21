@@ -16,10 +16,10 @@ This is the Delta Ats backend repository. The RestAPI is created using nodejs, e
 ## SETUP For the RestAPI
 
 ### Installation
-1) Install VS code\
-2) Install the latest version of node\
-3) Install npm (node package manager)\
-4) Clone the Delta Delta-ATS-Backend repository from github\
+1) Install VS code
+2) Install the latest version of node
+3) Install npm (node package manager)
+4) Clone the Delta Delta-ATS-Backend repository from github
 5) After pulling the most recent changes, run:
 ### `npm install`
 
