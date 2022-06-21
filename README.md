@@ -27,12 +27,12 @@ This is the Delta Ats backend repository. The RestAPI is created using nodejs, e
 
 in the project directory to install any new modules.
 
-Create a .env file, and create 5 variables and put in the nessecary values:\
+Create a .env file, and create 5 variables and put in the necessary values:\
 USER=pgadmin\
 HOST=localhost\
 DATABASE=(what you named your database)\
 PASSWORD=(the password you set up)\
-PORT=(defaulted to 5432)\
+PORT=(defaulted to 5432)
 
 To run your server, cd into where your index.js is kept and run:
 ### `node index.js`
