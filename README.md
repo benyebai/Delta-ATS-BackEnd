@@ -8,19 +8,19 @@ This is the Delta Ats backend repository. The RestAPI is created using nodejs, e
 - Install PGADMIN
 
 ### Setting up the tables
-- Within PGADMIN, create a new database
-- Create a new schema named "applicant_data"
-- Right click on the schema and open query tool
-- copy and paste the code within the file "create-table" and run
+1) Within PGADMIN, create a new database
+2) Create a new schema named "applicant_data"
+3) Right click on the schema and open query tool
+4) copy and paste the code within the file "create-table" and run
 
 ## SETUP For the RestAPI
 
 ### Installation
--Install VS code\
--Install the latest version of node\
--Install npm (node package manager)\
--Clone the Delta Delta-ATS-Backend repository from github
--After pulling the most recent changes, run:
+1) Install VS code\
+2) Install the latest version of node\
+3) Install npm (node package manager)\
+4) Clone the Delta Delta-ATS-Backend repository from github\
+5) After pulling the most recent changes, run:
 ### `npm install`
 
 ### Usage
