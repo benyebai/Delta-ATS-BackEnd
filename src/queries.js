@@ -57,7 +57,7 @@ const createUser = (request, response) => {
     })
     pool.connect((err, client, done)=> {
       if (err) throw err
-      client.query('INSERT INTO applicant_data.account_details (email, password, creation_date, role) VALUES ($1,$2, $3, $4) ', [email, password, creation_date, 'gamer'], (error, results) => {
+      client.query('INSERT INTO applicant_data.account_details (email, password, creation_date, role) VALUES ($1, $2, $3, $4) ', [email, password, creation_date, 'gamer'], (error, results) => {
         //done()
         if (error){
             throw error
@@ -149,7 +149,7 @@ const modifyInfo = (request, response) => {
 
   const first_name = request.body.firstName
   const last_name = request.body.lastName
-  //const pronoun = request.body.pronouns
+  const pronoun = request.body.pronouns
   
   const city = request.body.city
   const country = request.body.country
@@ -182,7 +182,7 @@ const modifyInfo = (request, response) => {
     
   })
 
-  response.status(200).send("success")
+  response.status(200)
 
 }
 

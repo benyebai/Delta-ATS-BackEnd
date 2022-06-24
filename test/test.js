@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 describe('api',() => {
 
     describe("POST /modify", () => {
-        it("it should return if its modified", (done) => {
+        it("it should return if its modified", async () => {
             chai.request(server)
                 .post("/modify")
                 .send({
@@ -35,6 +35,20 @@ describe('api',() => {
         })
 
 
+    })
+
+    describe("POST /users/checkValidEmail", () => {
+        it("it should return if it checked valid email", async () => {
+            chai.request(server)
+                .post("/users/checkValidEmail")
+                .send({
+                    email: "sus@gmail.com"
+                  })
+                .end((err, response) => {
+                    response.should.have.status(201);
+                })
+
+        })
     })
 
 })
