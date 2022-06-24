@@ -61,6 +61,8 @@ app.post('/modify',
   body('postalCode').isAlphanumeric(),
   db.modifyInfo)
 
+app.post('/getID', db.getAccountId)
+
 app.listen(port, () => {  
     console.log(`Example app listening on port ${port}`)
 })

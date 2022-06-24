@@ -188,6 +188,21 @@ const modifyInfo = (request, response) => {
 
 }
 
+const getAccountId = (request, response) => {
+  const email = request.params.email
+
+  pool.query('SELECT * FROM applicant_data.account_details WHERE email = $1', [email], (error, results) => {
+    if (error) {
+      throw error
+    }
+
+    console.log(results)
+
+    response.status(200).send(results)
+  })
+
+}
+
 
   module.exports = {
     checkValidEmail,
@@ -196,6 +211,7 @@ const modifyInfo = (request, response) => {
     updateUser,
     deleteUser,
     checkUserPassword,
-    modifyInfo
+    modifyInfo,
+    getAccountId
 
   }
