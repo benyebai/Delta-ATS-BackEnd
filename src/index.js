@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const app = express()
 const port = 3001
 
-
+//Sanitization and validation of data that is entered when creating an account
 var loginValidate = [
   body('email', 'Email is invalid').isEmail(),
   body('password').isLength({ min: 8 })
@@ -23,13 +23,13 @@ var loginValidate = [
 ];
 
 
+//Bypass of CORS policy
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
   res.header("Access-Control-Allow-Headers", "url, Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Origin");
   next();
 });
-
 
 
 app.use(bodyParser.json())
@@ -39,20 +39,10 @@ app.use(
     })
   )
 
-
-
-
 app.post('/users/checkValidEmail',  db.checkValidEmail),
-
-app.post('/users/authenticate',
-    db.checkUserPassword)
-
+app.post('/users/authenticate', db.checkUserPassword)
 app.post('/users/create',loginValidate, db.createUser)
 
-
-app.put('/users/:account_id', db.updateUser)
-app.delete('/users/:account_id', db.deleteUser)
-app.get('/users/:account_id', db.getUserById)
 
 // uses functions from the express validator library for info  validation
 app.post('/modify', 
