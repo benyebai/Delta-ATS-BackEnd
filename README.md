@@ -10,8 +10,9 @@ This is the Delta Ats backend repository. The RestAPI is created using nodejs, e
 ### Setting up the tables
 1) Within PGADMIN, create a new database
 2) Create a new schema named "applicant_data"
-3) Right click on the schema and open query tool
-4) copy and paste the code within the file "create-table" and run
+3) Right click on the database and open generate erd
+4) download and open the file with .pgerd
+5) at the top, click on the generate sql and run
 
 ## SETUP For the RestAPI
 
