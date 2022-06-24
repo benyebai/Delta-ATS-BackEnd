@@ -79,6 +79,14 @@ const createUser = (request, response) => {
           }
           response.status(201).send(`Profile Added`)
            }) 
+           var token = jwt.sign({ id: email }, config.secret, {
+            expiresIn: 86400 // 24 hours
+          });
+            //console.log(results.email)
+      
+            response.status(201).send({        
+              accessToken: token
+          });
       })
     
 }
@@ -112,29 +120,6 @@ const updateUser = (request, response) => {
     )
   }
 
-//Unused
-  const deleteUser = (request, response) => {
-    const account_id = parseInt(request.params.account_id)
-  
-    pool.query('DELETE FROM applicant_data.account_details WHERE account_id = $1', [account_id], (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).send(`User deleted with ID: ${account_id}`)
-    })
-  }
-
-  //Unused
-const getUserById = (request, response) => {
-    
-  const account_id = parseInt(request.params.account_id)
-  pool.query('SELECT * FROM applicant_data.account_details WHERE account_id = $1', [account_id], (error, results) =>{
-      if (error) {
-          throw error
-      }
-      response.status(200).json(results.rows)
-  })
-}
 
 const modifyInfo = (request, response) => {
 

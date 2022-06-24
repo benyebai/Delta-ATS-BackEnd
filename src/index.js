@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const app = express()
 const port = 3001
 
+
 var loginValidate = [
   body('email', 'Email is invalid').isEmail(),
   body('password').isLength({ min: 8 })
@@ -48,10 +49,8 @@ app.post('/users/authenticate',
 
 app.post('/users/create',loginValidate, db.createUser)
 
-//Unused calls
+
 app.put('/users/:account_id', db.updateUser)
-app.delete('/users/:account_id', db.deleteUser)
-app.get('/users/:account_id', db.getUserById)
 app.post('/modify', 
   body('firstName').isAlpha().isLength({max:30}),
   body('lastName').isAlpha().isLength({max:30}),
