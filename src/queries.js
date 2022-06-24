@@ -136,6 +136,8 @@ const getUserById = (request, response) => {
   })
 }
 
+
+// a function that takes info from the frontend and modifies the info within the database
 const modifyInfo = (request, response) => {
 
   const errors = validationResult(request);
@@ -175,8 +177,7 @@ const modifyInfo = (request, response) => {
     
 
   })
-  
-  //'UPDATE public.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id]
+
   
   pool.query('UPDATE public.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id], (error, results) => {
     if (error) {
