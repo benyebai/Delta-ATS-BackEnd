@@ -22,7 +22,7 @@ const checkUserPassword = (request, response) => {
     //const account_email = parseInt(request.params.account_email)
     const {email, password} = request.body
 
-    pool.query('SELECT * FROM applicant_data.account_details WHERE email = $1 AND password = crypt($2, password)', [email, password], (error, results) =>{
+    pool.query('SELECT * FROM applicant_data.account_details WHERE email = $1 AND password = $2', [email, password], (error, results) =>{
 
         if (error) {
             throw error
@@ -56,7 +56,7 @@ const createUser = (request, response) => {
     })
     pool.connect((err, client, done)=> {
       if (err) throw err
-      client.query('INSERT INTO applicant_data.account_details (email,  password, creation_date) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3) ', [email, password, creation_date], (error, results) => {
+      client.query('INSERT INTO applicant_data.account_details (email, password, creation_date, role) VALUES ($1,$2, $3, $4) ', [email, password, creation_date, 'gamer'], (error, results) => {
         //done()
         if (error){
             throw error
@@ -71,7 +71,7 @@ const createUser = (request, response) => {
          
         })
 
-        client.query('INSERT INTO applicant_data.profile_table (first_name,  last_name, pronoun) VALUES ($1, $2, $3) ', [firstName, lastName, pronoun], (error, results) => {
+        client.query('INSERT INTO applicant_data.profile_table (first_name, last_name, pronoun) VALUES ($1, $2, $3) ', [firstName, lastName, 'they'], (error, results) => {
           done()
           if (error){
               throw error
@@ -142,14 +142,11 @@ const modifyInfo = (request, response) => {
     return response.status(400).json({errors:errors.array()})
   }
   
-  const profile_id = parseInt(request.body.profileID)
+  const account_id = 1
 
   const first_name = request.body.firstName
   const last_name = request.body.lastName
-  const pronoun = request.body.pronouns
-
-
-  const contact_id = parseInt(request.body.contactID)
+  //const pronoun = request.body.pronouns
   
   const city = request.body.city
   const country = request.body.country
@@ -164,7 +161,7 @@ const modifyInfo = (request, response) => {
     if (error) {
       return console.error("Error with client", error.stack)
     }
-    client.query('UPDATE public.profile_table SET first_name = $1, last_name = $2, pronoun = $3 WHERE profile_id = $4', [first_name, last_name, pronoun, profile_id], (error, results) => {
+    client.query('UPDATE applicant_data.profile_table SET first_name = $1, last_name = $2 WHERE account_id = $3', [first_name, last_name, account_id], (error, results) => {
       
       release()
       if (error){
@@ -175,9 +172,9 @@ const modifyInfo = (request, response) => {
 
   })
   
-  //'UPDATE public.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id]
+  //'UPDATE applicant_data.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id]
   
-  pool.query('UPDATE public.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id], (error, results) => {
+  pool.query('UPDATE applicant_data.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE account_id = $7', [city, country, postal_code, phone_number, address, province, account_id], (error, results) => {
     if (error) {
       throw error
     }
@@ -186,14 +183,30 @@ const modifyInfo = (request, response) => {
 
 }
 
+const getAccountId = (request, response) => {
+  const email = request.params.email
 
-  module.exports = {
-    checkValidEmail,
-    getUserById,
-    createUser,
-    updateUser,
-    deleteUser,
-    checkUserPassword,
-    modifyInfo
+  pool.query('SELECT * FROM applicant_data.account_details WHERE email = $1', [email], (error, results) => {
+    if (error) {
+      throw error
+    }
 
-  }
+    console.log(results)
+
+    response.status(200).send(results)
+  })
+
+}
+
+
+module.exports = {
+  checkValidEmail,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  checkUserPassword,
+  modifyInfo,
+  getAccountId
+
+}

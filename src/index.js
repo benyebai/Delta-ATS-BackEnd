@@ -1,11 +1,13 @@
 const express = require('express')
-
+require('dotenv').config()
 const db = require('./queries')
 const { body } = require('express-validator');
 const bodyParser = require('body-parser')
 const app = express()
 const port = 3001
 
+
+/*
 var loginValidate = [
   body('email', 'Email is invalid').isEmail(),
   body('password').isLength({ min: 8 })
@@ -20,6 +22,7 @@ var loginValidate = [
   body('postalCode').escape(),
   body('address').escape(),
 ];
+*/
 
 
 app.use((req, res, next) => {
@@ -36,7 +39,7 @@ app.use(
     bodyParser.urlencoded({
       extended: true,
     })
-  )
+)
 
 
 
@@ -46,7 +49,7 @@ app.post('/users/checkValidEmail',  db.checkValidEmail),
 app.post('/users/authenticate',
     db.checkUserPassword)
 
-app.post('/users/create',loginValidate, db.createUser)
+app.post('/users/create', db.createUser)
 
 //Unused calls
 app.put('/users/:account_id', db.updateUser)
@@ -58,6 +61,7 @@ app.post('/modify',
   body('phoneNum').isLength({max:12}).isMobilePhone(),
   body('postalCode').isAlphanumeric(),
   db.modifyInfo)
+app.post('/getID', db.getAccountId)
 
 app.listen(port, () => {  
     console.log(`Example app listening on port ${port}`)
