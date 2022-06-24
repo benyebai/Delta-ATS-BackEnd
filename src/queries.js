@@ -46,7 +46,8 @@ const createUser = (request, response) => {
   if (!errors.isEmpty()) {
     return response.status(422).json({errors:errors.array()})
   }
-    const {email, password, pronoun, firstName, lastName, country, province, city, postalCode, address, phoneNum} = request.body;
+    const {email, password, firstName, lastName, country, province, city, postalCode, address, phoneNum} = request.body;
+    const pronoun = "He"
     var creation_date = new Date();
     creation_date =  (creation_date.getUTCFullYear() + '-' + (creation_date.getUTCMonth() + 1) + '-' + creation_date.getUTCDate());
     
@@ -135,6 +136,8 @@ const getUserById = (request, response) => {
   })
 }
 
+
+// a function that takes info from the frontend and modifies the info within the database
 const modifyInfo = (request, response) => {
 
   const errors = validationResult(request);
@@ -172,14 +175,14 @@ const modifyInfo = (request, response) => {
 
   })
   
-  //'UPDATE applicant_data.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE contact_id = $7', [city, country, postal_code, phone_number, address, province, contact_id]
-  
   pool.query('UPDATE applicant_data.contact_info SET city = $1, country = $2, postal_code = $3, phone_number = $4, address = $5, province = $6 WHERE account_id = $7', [city, country, postal_code, phone_number, address, province, account_id], (error, results) => {
     if (error) {
       throw error
     }
     
   })
+
+  response.status(200).send("success")
 
 }
 

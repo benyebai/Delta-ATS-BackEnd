@@ -55,6 +55,8 @@ app.post('/users/create', db.createUser)
 app.put('/users/:account_id', db.updateUser)
 app.delete('/users/:account_id', db.deleteUser)
 app.get('/users/:account_id', db.getUserById)
+
+// uses functions from the express validator library for info  validation
 app.post('/modify', 
   body('firstName').isAlpha().isLength({max:30}),
   body('lastName').isAlpha().isLength({max:30}),
@@ -66,3 +68,5 @@ app.post('/getID', db.getAccountId)
 app.listen(port, () => {  
     console.log(`Example app listening on port ${port}`)
 })
+
+module.exports = app
