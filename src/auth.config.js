@@ -1,4 +1,4 @@
 module.exports = {
-    secret: "delta-ats"
+    secret: "base64"
   };
   
