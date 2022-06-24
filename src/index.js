@@ -42,7 +42,7 @@ app.use(
 app.post('/users/checkValidEmail',  db.checkValidEmail),
 app.post('/users/authenticate', db.checkUserPassword)
 app.post('/users/create',loginValidate, db.createUser)
-
+app.post('/users/userProfile', db.getUserProfile)
 
 // uses functions from the express validator library for info  validation
 app.post('/modify', 

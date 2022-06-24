@@ -56,7 +56,7 @@ const createUser = (request, response) => {
     const {email, password, firstName, lastName, country, province, city, postalCode, address, phoneNum} = request.body;
     const pronoun = "He"
     const role = "Applicant"
-    console.log(role)
+
     var creation_date = new Date();
     creation_date =  (creation_date.getUTCFullYear() + '-' + (creation_date.getUTCMonth() + 1) + '-' + creation_date.getUTCDate());
     
@@ -66,13 +66,13 @@ const createUser = (request, response) => {
     })
     pool.connect((err, client, done)=> {
       if (err) throw err
-      client.query('INSERT INTO applicant_data.account_details (email,  password, creation_date, role) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3, $4) ', [email, password, creation_date, role], (error, results) => {
+      client.query('INSERT INTO applicant_data.account_details (email, password, creation_date, role) VALUES ($1, crypt($2, gen_salt(\'bf\')), $3, $4) ', [email, password, creation_date, role], (error, results) => {
 
         if (error){
             throw error
         }
          })
-        console.log("GOT HERE")
+
          client.query('INSERT INTO applicant_data.contact_info (phone_number,  address, city, country, postal_code, province) VALUES ($1, $2, $3, $4, $5, $6) ', [phoneNum, address, city, country, postalCode, province], (error, results) => {
           if (error){
             return console.error("Error with database input", error.stack)
@@ -80,25 +80,85 @@ const createUser = (request, response) => {
          
         })
 
-        client.query('INSERT INTO applicant_data.profile_table (first_name,  last_name, pronoun) VALUES ($1, $2, $3) ', [firstName, lastName, pronoun], (error, results) => {
-          done()
+        client.query('INSERT INTO applicant_data.profile_table (first_name, last_name, pronoun) VALUES ($1, $2, $3) ', [firstName, lastName, pronoun], (error, results) => {
+          
           if (error){
               throw error
           }
 
            }) 
+           client.query('SELECT account_id FROM applicant_data.account_details WHERE email = $1', [email], (error, results) => {
 
-           //Creating and returning the token
-           var token = jwt.sign({ id: email }, config.secret, {
+            done()
+            if (error) {
+              throw error
+            }
+
+            var currentAccountId = (results.rows[0]['account_id'])
+            //currentAccountId = results
+              //Creating and returning the token
+           var token = jwt.sign({ id: currentAccountId}, config.secret, {
             expiresIn: 86400 // 24 hours
           });
             response.status(201).send({        
               accessToken: token
-          });
+          });          
+        })
+         
       })
     
 }
 
+/**Return a user's profile data
+ * 
+ * @param {object} token the authentication token provided by the user.
+ * @return {object} a json object that contains the following profile info: phone_number, address, city, country, postal_code, province, first_name, last_name and email.
+ * 
+*/
+const getUserProfile = (request, response) => {
+    let data = []
+    let token = request.body.token;
+
+    var accountId =  JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    var accountId = accountId["id"]
+
+
+    pool.on('error', (err, client) =>  {
+      console.error('Unexpected error on idle client', err)
+      process.exit(-1)
+    })
+    pool.connect((err, client, done)=> {
+      if (err) throw err
+    
+      client.query('SELECT phone_number, address, city, country, postal_code, province FROM applicant_data.contact_info WHERE account_id = $1', [accountId], (error, results) => {
+
+        if (error){
+            throw error
+        }
+        data.push(results.rows)
+         })
+
+         client.query('SELECT first_name, last_name FROM applicant_data.profile_table WHERE account_id = $1', [accountId],(error, results) => {
+          if (error){
+            return console.error("Error with database input", error.stack)
+          }
+
+          data.push(results.rows)
+
+        })
+        client.query('SELECT email FROM applicant_data.account_details WHERE account_id = $1', [accountId], (error, results) => {
+
+          if (error){
+              throw error
+          }
+          data.push(results.rows)
+          return response.status(200).send({
+            data})
+           })
+
+      })
+    
+}
 /**Checking whether or not an email has been used before
  * @param {string} email the email to check 
  * @return {object} the email account, if it exists. Otherwise, returns empty.
@@ -172,6 +232,6 @@ const modifyInfo = (request, response) => {
     checkValidEmail,
     createUser,
     checkUserPassword,
-    modifyInfo
-
+    modifyInfo,
+    getUserProfile,
   }
